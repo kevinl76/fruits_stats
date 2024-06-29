@@ -2,7 +2,6 @@ import requests
 import streamlit as st
 import pandas as pd
 import plotly.graph_objs as go
-import plotly.express as px
 
 # Streamlit button for rerun
 st.button("Re-run")
@@ -23,9 +22,6 @@ for fruit in fruits:
     if fruit['name'].lower() not in ['hazelnut', 'dragonfruit']:
         event_info = {
             'name': fruit['name'],
-            'family': fruit['family'],
-            'order': fruit['order'],
-            'genus': fruit['genus'],
             'calories': fruit['nutritions']['calories'],
             'fat': fruit['nutritions']['fat'],
             'sugar': fruit['nutritions']['sugar'],
@@ -37,51 +33,43 @@ for fruit in fruits:
 # Create a DataFrame
 df = pd.DataFrame(extracted_fruits)
 
-# Create custom hover text
-df['hover_text'] = df.apply(
-    lambda row: f"Fruit: {row['name']}<br>Protein: {row['protein']}g<br>Carbohydrates: {row['carbohydrates']}g<br>Fat: {row['fat']}g",
-    axis=1
+# Create a multiselect menu for fruit selection
+options = st.multiselect(
+    'Select fruits to display',
+    df['name'].unique()
 )
 
-# Create the 3D scatter plot with Plotly
-fig = go.Figure()
+# Display the selected options
+st.write("You selected:", options)
 
-# Define the colormap
-colormap = px.colors.sequential.Viridis
+if options:
+    # Filter the DataFrame based on the selected fruits
+    selected_fruits = df[df['name'].isin(options)]
 
-# Add each fruit as a scatter plot point with custom hover text
-for i in range(len(df)):
-    fig.add_trace(go.Scatter3d(
-        x=[df['protein'][i]],
-        y=[df['carbohydrates'][i]],
-        z=[df['fat'][i]],
-        mode='markers+text',
-        marker=dict(size=10, color=colormap[i % len(colormap)]),
-        text=df['name'][i],
-        textposition='top center',
-        hovertext=df['hover_text'][i],
-        hoverinfo='text',
-        showlegend=False  # Disable legend for each trace
-    ))
+    # Create radar chart for the selected fruits
+    fig = go.Figure()
 
-# Define axis colors
-protein_color = 'red'
-carbohydrates_color = 'blue'
-fat_color = 'green'
+    for i, row in selected_fruits.iterrows():
+        fig.add_trace(go.Scatterpolar(
+            r=[ row['fat'], row['sugar'], row['carbohydrates'], row['protein']],
+            theta=[ 'Fat', 'Sugar', 'Carbohydrates', 'Protein'],
+            fill='toself',
+            name=row['name']
+        ))
 
-# Update layout for better visualization
-fig.update_layout(
-    title='3D Scatter Plot of Fruits by Nutrient Content',
-    scene=dict(
-        xaxis=dict(title='Protein (g)', titlefont=dict(color=protein_color), tickfont=dict(color=protein_color)),
-        yaxis=dict(title='Carbohydrates (g)', titlefont=dict(color=carbohydrates_color), tickfont=dict(color=carbohydrates_color)),
-        zaxis=dict(title='Fat (g)', titlefont=dict(color=fat_color), tickfont=dict(color=fat_color))
-    ),
-    template='plotly_dark',  # Set the dark template
-    showlegend=False,  # Disable legend in the layout
-    width=1200,
-    height=800
-)
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, max(df['fat'].max(), df['sugar'].max(), df['carbohydrates'].max(), df['protein'].max())]
+            )
+        ),
+        showlegend=True,
+        template='ggplot2',  # Set the dark template
+        title='Nutritional Content of Selected Fruits'
+    )
 
-# Display the plot using Streamlit with specified width and height
-st.plotly_chart(fig, use_container_width=True)
+    # Display the radar chart using Streamlit
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    st.write("Please select at least one fruit to display the chart.")
