@@ -1,13 +1,7 @@
-import matplotlib.pyplot
 import requests
-import pandas as pd
-import streamlit as st
-import numpy as np
-import matplotlib.pyplot as plt
 import streamlit as st
 import pandas as pd
-import time
-import numpy as np
+
 import plotly.graph_objs as go
 import plotly.express as px
 import seaborn as sns
