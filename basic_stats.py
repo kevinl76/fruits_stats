@@ -20,18 +20,19 @@ fruits = json_data
 extracted_fruits = []
 
 for fruit in fruits:
-    event_info = {
-        'name': fruit['name'],
-        'family': fruit['family'],
-        'order': fruit['order'],
-        'genus': fruit['genus'],
-        'calories': fruit['nutritions']['calories'],
-        'fat': fruit['nutritions']['fat'],
-        'sugar': fruit['nutritions']['sugar'],
-        'carbohydrates': fruit['nutritions']['carbohydrates'],
-        'protein': fruit['nutritions']['protein']
-    }
-    extracted_fruits.append(event_info)
+    if fruit['name'].lower() not in ['hazelnut', 'dragonfruit']:
+        event_info = {
+            'name': fruit['name'],
+            'family': fruit['family'],
+            'order': fruit['order'],
+            'genus': fruit['genus'],
+            'calories': fruit['nutritions']['calories'],
+            'fat': fruit['nutritions']['fat'],
+            'sugar': fruit['nutritions']['sugar'],
+            'carbohydrates': fruit['nutritions']['carbohydrates'],
+            'protein': fruit['nutritions']['protein']
+        }
+        extracted_fruits.append(event_info)
 
 # Create a DataFrame
 df = pd.DataFrame(extracted_fruits)
@@ -60,7 +61,7 @@ for i in range(len(df)):
         textposition='top center',
         hovertext=df['hover_text'][i],
         hoverinfo='text',
-        name=df['name'][i]
+        showlegend=False  # Disable legend for each trace
     ))
 
 # Define axis colors
@@ -76,7 +77,7 @@ fig.update_layout(
         yaxis=dict(title='Carbohydrates (g)', titlefont=dict(color=carbohydrates_color), tickfont=dict(color=carbohydrates_color)),
         zaxis=dict(title='Fat (g)', titlefont=dict(color=fat_color), tickfont=dict(color=fat_color))
     ),
-    showlegend=False,
+    showlegend=False,  # Disable legend in the layout
     width=1200,
     height=800
 )
