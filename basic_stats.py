@@ -76,7 +76,7 @@ fig.update_layout(
         yaxis=dict(title='Carbohydrates (g)', titlefont=dict(color=carbohydrates_color), tickfont=dict(color=carbohydrates_color)),
         zaxis=dict(title='Fat (g)', titlefont=dict(color=fat_color), tickfont=dict(color=fat_color))
     ),
-    legend_title='Fruits',
+    showlegend=False,
     width=1200,
     height=800
 )
