@@ -1,27 +1,19 @@
 import requests
 import streamlit as st
 import pandas as pd
-
 import plotly.graph_objs as go
 import plotly.express as px
-import seaborn as sns
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-# # streamlit run "C:/Users/Namaste/Desktop/Others/Numa/Machine Learning Projects/fruit_stats/my_streamlit_app.py"
-# Streamlit widgets automatically run the script from top to bottom. Since
-# this button is not connected to any other logic, it just causes a plain
-# rerun.
+
+# Streamlit button for rerun
 st.button("Re-run")
+
 st.write("""
-# My first app!*
+# My first app!
 """)
-# py -m streamlit run my_streamlit_app.py
 
+# Fetch data from the API
 response = requests.get("https://www.fruityvice.com/api/fruit/all")
-
-json_data= response.json()
-
-
+json_data = response.json()
 
 # Extract the necessary information
 fruits = json_data
@@ -38,15 +30,11 @@ for fruit in fruits:
         'sugar': fruit['nutritions']['sugar'],
         'carbohydrates': fruit['nutritions']['carbohydrates'],
         'protein': fruit['nutritions']['protein']
-        }
-
+    }
     extracted_fruits.append(event_info)
-#
+
 # Create a DataFrame
-df_extracted = pd.DataFrame(extracted_fruits)
-df=pd.DataFrame(df_extracted)
-
-
+df = pd.DataFrame(extracted_fruits)
 
 # Create custom hover text
 df['hover_text'] = df.apply(
@@ -75,11 +63,11 @@ for i in range(len(df)):
         name=df['name'][i]
     ))
 
-# Update layout for better visualization
 # Define axis colors
 protein_color = 'red'
 carbohydrates_color = 'blue'
 fat_color = 'green'
+
 # Update layout for better visualization
 fig.update_layout(
     title='3D Scatter Plot of Fruits by Nutrient Content',
@@ -89,10 +77,9 @@ fig.update_layout(
         zaxis=dict(title='Fat (g)', titlefont=dict(color=fat_color), tickfont=dict(color=fat_color))
     ),
     legend_title='Fruits',
-    width=1200,  # Set the width of the figure
-    height=800   # Set the height of the figure
+    width=1200,
+    height=800
 )
-
 
 # Display the plot using Streamlit with specified width and height
 st.plotly_chart(fig, use_container_width=True)
